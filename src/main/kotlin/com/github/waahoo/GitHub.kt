@@ -14,7 +14,7 @@ object GitHub {
     runBlocking {
       val result = client.get(
         "https://api.github.com/repos/$user/$repo/releases",
-        mapOf(
+        headers = mapOf(
           "Authorization" to "token $token",
           "Accept" to "application/vnd.github.v3.raw"
         )
@@ -26,11 +26,12 @@ object GitHub {
             val id = asset["id"].content
             client.download(
               File(file), "https://api.github.com/repos/$user/$repo/releases/assets/$id",
-              mapOf(
+              headers = mapOf(
                 "Accept" to "application/octet-stream",
                 "Authorization" to "token $token"
               )
             )
+            return@runBlocking
           }
         }
       }

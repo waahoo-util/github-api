@@ -1,4 +1,5 @@
 plugins {
+  `maven-publish`
   kotlin("jvm") version "1.3.71"
   kotlin("plugin.serialization") version "1.3.71"
   id("com.github.johnrengelman.shadow") version "5.2.0"
@@ -6,7 +7,7 @@ plugins {
 }
 
 group = "com.github.waahoo-util"
-version = "0.0.3"
+version = "0.0.4"
 
 repositories {
   mavenCentral()
@@ -31,6 +32,17 @@ tasks {
   }
   compileTestKotlin {
     kotlinOptions.jvmTarget = "1.8"
+  }
+}
+
+val kotlinSourcesJar by tasks
+
+publishing {
+  publications {
+    create<MavenPublication>("maven") {
+      from(components["kotlin"])
+      artifact(kotlinSourcesJar)
+    }
   }
 }
 

@@ -12,13 +12,8 @@ import java.net.Proxy
 
 object GitHub {
   
-  init {
-    initClient(
-      proxy = Proxy(
-        Proxy.Type.HTTP,
-        InetSocketAddress("127.0.0.1", 8080)
-      )
-    )
+  fun init() {
+    initClient()
   }
   
   val baseURL = url("https", "api.github.com", "repos")

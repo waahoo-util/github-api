@@ -9,12 +9,19 @@ fun errorIf(condition: Boolean, msg: () -> String) {
 
 suspend fun main(args: Array<String>) {
   if (args.isEmpty()) {
-    println("usage: download|upload <token> <user_repo> <tag> <file>")
+    println("usage: download|upload|release <token> <user_repo> <tag> <file>")
     return
+  }
+  for (arg in args) {
+    println(arg)
   }
   GitHub.init()
   try {
     when (args[0]) {
+      "release" -> {
+        errorIf(args.size != 5) { "usage: release <token> <user_repo> <tag>" }
+        GitHub.getOrCreateTag(args[1], args[2], args[3])
+      }
       "download" -> {
         errorIf(args.size != 5) { "usage: download <token> <user_repo> <tag> <file>" }
         GitHub.downloadAsset(args[1], args[2], args[3], args[4])

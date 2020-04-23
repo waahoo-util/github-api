@@ -9,10 +9,13 @@ import java.io.File
 import java.io.FileInputStream
 import java.net.InetSocketAddress
 import java.net.Proxy
+import java.nio.file.Files
+import kotlin.streams.toList
 
 object GitHub {
   
   fun init() {
+//    initClient(proxy = Proxy(Proxy.Type.HTTP, InetSocketAddress("127.0.0.1", 8080)))
     initClient()
   }
   
@@ -77,35 +80,47 @@ object GitHub {
   suspend fun uploadAsset(
     token: String, userRepo: String, tag: String, file: String
   ) {
-    val filePath = File(file)
-    val name = filePath.name
     val release = getOrCreateTag(token, userRepo, tag)
     var upload_url = release["upload_url"].content
     upload_url = upload_url.substring(0, upload_url.indexOf("{"))
     
-    for (asset in release["assets"].jsonArray)
-      if (asset["name"].content == name) {
-        val (code, result) = client.deleteCode(
-          asset["url"].content.toHttpUrl(),
-          headers(
-            "Authorization", "token $token",
-            "Accept", "application/vnd.github.v3+json"
-          )
-        )
-        break
-      }
+    val filePath = File(file)
+    val files = mutableListOf<File>()
+    if (filePath.isDirectory)
+      files += Files.walk(filePath.toPath(), 1).map {
+        it.toFile()
+      }.filter {
+        println(it.toString())
+        it.isFile
+      }.toList()
     
-    val (code, result) = client.postCode(
-      "$upload_url?name=$name".toHttpUrl(),
-      headers(
-        "Authorization", "token $token",
-        "Accept", "application/vnd.github.v3+json"
-      ),
-      body = FileInputStream(filePath),
-      mediaType = "application/octet-stream"
-    )
-    if (code != 201)
-      error("error upload asset /$userRepo/$tag/$file")
+    files.forEach {
+      val name = it.name
+      
+      for (asset in release["assets"].jsonArray)
+        if (asset["name"].content == name) {
+          val (code, result) = client.deleteCode(
+            asset["url"].content.toHttpUrl(),
+            headers(
+              "Authorization", "token $token",
+              "Accept", "application/vnd.github.v3+json"
+            )
+          )
+          break
+        }
+      
+      val (code, result) = client.postCode(
+        "$upload_url?name=$name".toHttpUrl(),
+        headers(
+          "Authorization", "token $token",
+          "Accept", "application/vnd.github.v3+json"
+        ),
+        body = FileInputStream(it),
+        mediaType = "application/octet-stream"
+      )
+      if (code != 201)
+        error("error upload asset /$userRepo/$tag/$it $code $result")
+    }
   }
   
   fun close() {

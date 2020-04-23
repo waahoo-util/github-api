@@ -12,12 +12,13 @@ version = "0.0.5"
 repositories {
   mavenCentral()
   maven(url = "https://jitpack.io")
+  mavenLocal()
 }
 
 dependencies {
   val serializationVer = "0.20.0"
   implementation(kotlin("stdlib-jdk8"))
-  implementation("com.github.waahoo-util:http-stack:1.0.4")
+  implementation("com.github.waahoo-util:http-stack:1.0.5")
   api("org.jetbrains.kotlinx:kotlinx-serialization-runtime:$serializationVer")
   
 }

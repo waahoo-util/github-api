@@ -5,13 +5,12 @@ plugins {
   application
 }
 
-group = "com.github.waahoo"
-version = "0.0.2"
+group = "com.github.waahoo-util"
+version = "0.0.3"
 
 repositories {
   mavenCentral()
   maven(url = "https://jitpack.io")
-  mavenLocal()
 }
 
 dependencies {

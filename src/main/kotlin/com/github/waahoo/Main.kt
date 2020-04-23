@@ -8,7 +8,10 @@ fun errorIf(condition: Boolean, msg: () -> String) {
 }
 
 suspend fun main(args: Array<String>) {
-  errorIf(args.isNotEmpty()) { "args shouldn't be empty" }
+  if (args.isEmpty()) {
+    println("usage: download|upload <token> <user_repo> <tag> <file>")
+    return
+  }
   GitHub.init()
   try {
     when (args[0]) {

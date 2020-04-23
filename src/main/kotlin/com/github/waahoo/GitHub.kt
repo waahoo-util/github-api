@@ -90,7 +90,6 @@ object GitHub {
       files += Files.walk(filePath.toPath(), 1).map {
         it.toFile()
       }.filter {
-        println(it.toString())
         it.isFile
       }.toList()
     
@@ -118,7 +117,9 @@ object GitHub {
         body = FileInputStream(it),
         mediaType = "application/octet-stream"
       )
-      if (code != 201)
+      if (code == 201)
+        println("succeed upload asset $it to /$userRepo/$tag/")
+      else
         error("error upload asset /$userRepo/$tag/$it $code $result")
     }
   }
